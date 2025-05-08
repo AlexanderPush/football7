@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Футбольные Матчи</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script defer src="script.js"></script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -15,277 +14,154 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
       text-align: center;
     }
-
     h2 {
-      color: #333;
-      font-size: 2rem;
       margin: 20px;
+      font-size: 2rem;
+      color: #333;
     }
-
     #searchBar {
       margin: 20px;
       padding: 10px;
       border-radius: 8px;
-      width: 80%;
+      width: 90%;
       max-width: 400px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-
     #matches {
       display: flex;
       flex-direction: column;
       gap: 15px;
       width: 100%;
       max-width: 600px;
-      margin: 0 auto;
+      margin-bottom: 30px;
     }
-
     .match {
       background-color: #fff;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       padding: 15px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
-    .match:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
     .match-header {
       display: flex;
       justify-content: space-between;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .team-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
     .match-time {
       font-size: 0.9rem;
       color: #777;
     }
-
-    .teams {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .odds {
-      color: #ff6347;
-      font-weight: bold;
-    }
-
     .match-link {
-      display: block;
       margin-top: 10px;
+      display: inline-block;
       padding: 10px;
       background-color: #007bff;
       color: #fff;
-      text-decoration: none;
       border-radius: 5px;
-      text-align: center;
-      font-weight: bold;
+      text-decoration: none;
       transition: background-color 0.3s ease;
     }
-
     .match-link:hover {
       background-color: #0056b3;
     }
-
-    .team-logo {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .match-header img {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-    }
-
-    .search-container {
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 20px;
-    }
-
-    /* Медиазапросы для адаптивности */
-
-    /* Для экранов шириной до 768px (мобильные устройства и планшеты) */
-    @media (max-width: 768px) {
-      h2 {
-        font-size: 1.5rem;
-      }
-
-      #searchBar {
-        width: 90%;
-        font-size: 0.9rem;
-      }
-
-      .match {
-        padding: 12px;
-      }
-
-      .match-header {
-        font-size: 1rem;
-      }
-
-      .match-time {
-        font-size: 0.8rem;
-      }
-
-      .teams {
-        font-size: 1.3rem;
-      }
-
-      .odds {
-        font-size: 1rem;
-      }
-
-      .match-link {
-        font-size: 0.9rem;
-        padding: 8px;
-      }
-    }
-
-    /* Для экранов шириной до 480px (мобильные устройства) */
-    @media (max-width: 480px) {
-      h2 {
-        font-size: 1.2rem;
-      }
-
-      #searchBar {
-        width: 95%;
-        font-size: 0.8rem;
-      }
-
-      .match-header {
-        font-size: 0.9rem;
-      }
-
-      .match-time {
-        font-size: 0.7rem;
-      }
-
-      .teams {
-        font-size: 1.1rem;
-      }
-
-      .odds {
-        font-size: 0.9rem;
-      }
-
-      .match-link {
-        font-size: 0.8rem;
-        padding: 7px;
-      }
+    .odds {
+      margin-top: 8px;
+      font-weight: bold;
+      color: #ff6347;
     }
   </style>
 </head>
 <body>
   <h2>⚽ Футбольные Матчи</h2>
-
-  <!-- Поиск матчей -->
-  <div class="search-container">
-    <input type="text" id="searchBar" placeholder="Поиск матчей..." oninput="filterMatches()">
-  </div>
-
+  <input type="text" id="searchBar" placeholder="Поиск матчей..." oninput="filterMatches()" />
   <div id="matches">Загрузка...</div>
 
   <script>
-    const apiUrl = 'https://api.football-data.org/v4/matches'; // Используем реальный API для получения матчей
-    const apiKey = '4a0bce32b9584e8992e7a5c82548389d'; // Ваш API ключ
+    const apiUrl = 'https://api.football-data.org/v4/matches';
+    const apiKey = '4a0bce32b9584e8992e7a5c82548389d';
 
-    // Массив матчей для примера
     let matches = [];
 
-    // Функция для отображения матчей
-    const renderMatches = (matches) => {
-      const matchesContainer = document.getElementById('matches');
-      matchesContainer.innerHTML = ''; // Очищаем содержимое контейнера
+    const renderMatches = (list) => {
+      const container = document.getElementById('matches');
+      container.innerHTML = '';
 
-      if (matches.length === 0) {
-        matchesContainer.innerHTML = 'Матчи не найдены!';
+      if (list.length === 0) {
+        container.innerHTML = 'Матчи не найдены!';
+        return;
       }
 
-      matches.forEach(match => {
-        const matchElement = document.createElement('div');
-        matchElement.classList.add('match');
+      list.forEach(match => {
+        const matchDiv = document.createElement('div');
+        matchDiv.className = 'match';
 
-        matchElement.innerHTML = `
+        const home = match.homeTeam;
+        const away = match.awayTeam;
+        const link = `https://www.football-data.org/match/${match.id}`;
+
+        matchDiv.innerHTML = `
           <div class="match-header">
             <div class="team">
-              <img class="team-logo" src="${match.homeTeam.crest}" alt="Команда 1">
-              <span>${match.homeTeam.name}</span>
+              <img class="team-logo" src="${home.crest || ''}" alt="Домашняя команда"/>
+              <span>${home.name}</span>
             </div>
-            <span class="match-time">${new Date(match.utcDate).toLocaleTimeString()}</span>
+            <span class="match-time">${new Date(match.utcDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             <div class="team">
-              <img class="team-logo" src="${match.awayTeam.crest}" alt="Команда 2">
-              <span>${match.awayTeam.name}</span>
+              <img class="team-logo" src="${away.crest || ''}" alt="Гостевая команда"/>
+              <span>${away.name}</span>
             </div>
-            <span class="odds">${match.odds ? match.odds : 'Коэффициенты не доступны'}</span>
           </div>
-          <a href="${match.matchUrl}" class="match-link" target="_blank">Посмотреть матч</a>
           <p><strong>Соревнование:</strong> ${match.competition.name}</p>
-          <p><strong>Место проведения:</strong> ${match.venue}</p>
+          <p><strong>Место проведения:</strong> ${match.venue || 'Неизвестно'}</p>
+          <p class="odds">${match.odds ? `Коэффициенты: ${match.odds}` : 'Коэффициенты недоступны'}</p>
+          <a href="${link}" class="match-link" target="_blank">Подробнее</a>
         `;
 
-        matchesContainer.appendChild(matchElement);
+        container.appendChild(matchDiv);
       });
     };
 
-    // Функция фильтрации матчей по строке поиска
     const filterMatches = () => {
       const query = document.getElementById('searchBar').value.toLowerCase();
-      const filteredMatches = matches.filter(match => 
-        match.homeTeam.name.toLowerCase().includes(query) || 
-        match.awayTeam.name.toLowerCase().includes(query)
+      const filtered = matches.filter(m => 
+        m.homeTeam.name.toLowerCase().includes(query) ||
+        m.awayTeam.name.toLowerCase().includes(query)
       );
-      renderMatches(filteredMatches);
+      renderMatches(filtered);
     };
 
-    // Загружаем и отображаем матчи
     const fetchMatches = async () => {
       try {
-        const response = await fetch(apiUrl, {
+        const res = await fetch(apiUrl, {
           headers: {
             'X-Auth-Token': apiKey
           }
         });
-        const data = await response.json();
-
-        if (data.matches) {
-          matches = data.matches.map(match => ({
-            time: match.utcDate,
-            homeTeam: {
-              name: match.homeTeam.name,
-              crest: match.homeTeam.crest
-            },
-            awayTeam: {
-              name: match.awayTeam.name,
-              crest: match.awayTeam.crest
-            },
-            matchUrl: match.matchUrl,
-            odds: match.odds ? match.odds : 'N/A',
-            competition: match.competition,
-            venue: match.venue
-          }));
-          renderMatches(matches);
-        }
-      } catch (error) {
-        console.error('Ошибка при загрузке данных:', error);
+        const data = await res.json();
+        matches = data.matches || [];
+        renderMatches(matches);
+      } catch (err) {
+        console.error('Ошибка при загрузке матчей:', err);
+        document.getElementById('matches').innerText = 'Ошибка при загрузке данных.';
       }
     };
 
-    // Вызов функции для получения матчей
     fetchMatches();
   </script>
 </body>
