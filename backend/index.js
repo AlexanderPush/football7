@@ -7,17 +7,11 @@ const PORT = 10000;
 // Использование статики для фронтенда
 app.use(express.static(path.join(__dirname, '../frontend')));  // Убедитесь, что путь правильный
 
-// Обработчик главной страницы
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));  // Путь до index.html
-});
-
-// Простой API для получения матчей с реального API
 app.get('/api/matches', async (req, res) => {
   try {
     const response = await axios.get('https://api.football-data.org/v4/matches', {
       headers: {
-        'X-Auth-Token': '4a0bce32b9584e8992e7a5c82548389d'  // Ваш ключ API
+        'X-Auth-Token': process.env.FOOTBALL_API_KEY
       }
     });
     
