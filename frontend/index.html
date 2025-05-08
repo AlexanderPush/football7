@@ -34,6 +34,9 @@
     .match-time {
       font-weight: bold;
     }
+    .league {
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
@@ -58,32 +61,43 @@
       const matchesContainer = document.getElementById('matches');
       matchesContainer.innerHTML = '';
 
-      if (matches.length === 0) {
+      if (Object.keys(matches).length === 0) {
         matchesContainer.innerHTML = 'Матчи не найдены!';
         return;
       }
 
-      matches.forEach(match => {
-        const matchElement = document.createElement('div');
-        matchElement.classList.add('match');
+      // Перебираем лиги и отображаем матчи по каждой из них
+      for (const league in matches) {
+        const leagueContainer = document.createElement('div');
+        leagueContainer.classList.add('league');
 
-        matchElement.innerHTML = `
-          <div class="match-header">
-            <div class="team">
-              <img class="team-logo" src="${match.homeTeam.crest}" alt="${match.homeTeam.name}" />
-              <span>${match.homeTeam.name}</span>
-            </div>
-            <span class="match-time">${new Date(match.utcDate).toLocaleString()}</span>
-            <div class="team">
-              <img class="team-logo" src="${match.awayTeam.crest}" alt="${match.awayTeam.name}" />
-              <span>${match.awayTeam.name}</span>
-            </div>
-          </div>
-          <p><strong>Соревнование:</strong> ${match.competition}</p>
-        `;
+        const leagueTitle = document.createElement('h2');
+        leagueTitle.innerText = league;
+        leagueContainer.appendChild(leagueTitle);
 
-        matchesContainer.appendChild(matchElement);
-      });
+        matches[league].forEach(match => {
+          const matchElement = document.createElement('div');
+          matchElement.classList.add('match');
+
+          matchElement.innerHTML = `
+            <div class="match-header">
+              <div class="team">
+                <img class="team-logo" src="${match.homeTeam.crest}" alt="${match.homeTeam.name}" />
+                <span>${match.homeTeam.name}</span>
+              </div>
+              <span class="match-time">${new Date(match.utcDate).toLocaleString()}</span>
+              <div class="team">
+                <img class="team-logo" src="${match.awayTeam.crest}" alt="${match.awayTeam.name}" />
+                <span>${match.awayTeam.name}</span>
+              </div>
+            </div>
+          `;
+
+          leagueContainer.appendChild(matchElement);
+        });
+
+        matchesContainer.appendChild(leagueContainer);
+      }
     };
 
     fetchMatches();
