@@ -7,7 +7,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script defer src="script.js"></script>
   <style>
-    /* Общие стили для страницы */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f4f4f9;
@@ -27,7 +26,16 @@
       margin: 20px;
     }
 
-    /* Стили для контейнера с матчами */
+    #searchBar {
+      margin: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
     #matches {
       display: flex;
       flex-direction: column;
@@ -37,7 +45,6 @@
       margin: 0 auto;
     }
 
-    /* Стиль для каждой карточки матча */
     .match {
       background-color: #fff;
       border-radius: 10px;
@@ -91,17 +98,59 @@
     .match-link:hover {
       background-color: #0056b3;
     }
+
+    .team-logo {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .match-header img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
   </style>
 </head>
 <body>
   <h2>⚽ Football Matches</h2>
+
+  <!-- Поиск матчей -->
+  <div class="search-container">
+    <input type="text" id="searchBar" placeholder="Search matches..." oninput="filterMatches()">
+  </div>
+
   <div id="matches">Loading...</div>
 
   <script>
-    // Пример данных матчей
-    const matches = [
-      { time: '20:00', teams: 'Real Madrid vs Barcelona', link: 'https://stream1.com', odds: '1.9 - 3.2 - 4.1' },
-      { time: '22:00', teams: 'Manchester City vs PSG', link: 'https://stream2.com', odds: '2.1 - 3.0 - 3.5' }
+    const apiUrl = 'https://api.football-data.org/v4/matches'; // Пример API для получения данных
+    const apiKey = 'YOUR_API_KEY'; // Здесь нужно вставить ваш API ключ
+
+    // Массив матчей для примера
+    let matches = [
+      {
+        time: '20:00',
+        teams: 'Real Madrid vs Barcelona',
+        team1Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Real_Madrid_CF_logo.svg/800px-Real_Madrid_CF_logo.svg.png',
+        team2Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/FC_Barcelona_logo_2021.svg/800px-FC_Barcelona_logo_2021.svg.png',
+        link: 'https://stream1.com',
+        odds: '1.9 - 3.2 - 4.1'
+      },
+      {
+        time: '22:00',
+        teams: 'Manchester City vs PSG',
+        team1Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Manchester_City_FC_badge.svg/800px-Manchester_City_FC_badge.svg.png',
+        team2Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Paris_Saint-Germain_FC_2013_logo.svg/800px-Paris_Saint-Germain_FC_2013_logo.svg.png',
+        link: 'https://stream2.com',
+        odds: '2.1 - 3.0 - 3.5'
+      }
     ];
 
     // Функция для отображения матчей
@@ -112,13 +161,20 @@
       matches.forEach(match => {
         const matchElement = document.createElement('div');
         matchElement.classList.add('match');
-        
+
         matchElement.innerHTML = `
           <div class="match-header">
+            <div class="team">
+              <img class="team-logo" src="${match.team1Logo}" alt="Team 1">
+              <span>${match.teams.split(' vs ')[0]}</span>
+            </div>
             <span class="match-time">${match.time}</span>
+            <div class="team">
+              <img class="team-logo" src="${match.team2Logo}" alt="Team 2">
+              <span>${match.teams.split(' vs ')[1]}</span>
+            </div>
             <span class="odds">${match.odds}</span>
           </div>
-          <div class="teams">${match.teams}</div>
           <a href="${match.link}" class="match-link" target="_blank">Watch Match</a>
         `;
 
@@ -126,8 +182,43 @@
       });
     };
 
+    // Функция фильтрации матчей по строке поиска
+    const filterMatches = () => {
+      const query = document.getElementById('searchBar').value.toLowerCase();
+      const filteredMatches = matches.filter(match => 
+        match.teams.toLowerCase().includes(query)
+      );
+      renderMatches(filteredMatches);
+    };
+
     // Загружаем и отображаем матчи
     renderMatches(matches);
+
+    // Для получения данных с API
+    const fetchMatches = async () => {
+      try {
+        const response = await fetch(apiUrl, {
+          headers: {
+            'X-Auth-Token': apiKey
+          }
+        });
+        const data = await response.json();
+        matches = data.matches.map(match => ({
+          time: match.utcDate,
+          teams: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
+          team1Logo: match.homeTeam.crest,
+          team2Logo: match.awayTeam.crest,
+          link: match.matchUrl,
+          odds: 'N/A' // Замените на реальную информацию о коэффициентах, если API предоставляет
+        }));
+        renderMatches(matches);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    // Вызов функции для получения матчей
+    fetchMatches();
   </script>
 </body>
 </html>
