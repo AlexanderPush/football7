@@ -7,8 +7,7 @@ const port = 10000;
 
 const API_KEY = '4a0bce32b9584e8992e7a5c82548389d'; // Замените на ваш ключ API
 
-// Настройка Express для обслуживания статических файлов из папки 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend')));  // Убедитесь, что путь правильный
 
 // Endpoint для получения матчей по лигам
 app.get('/api/matches', async (req, res) => {
@@ -46,9 +45,9 @@ app.get('/api/matches', async (req, res) => {
   }
 });
 
-// Обработчик для корневого маршрута
+// Обработчик главной страницы
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));  // Путь до index.html
 });
 
 app.listen(port, () => {
