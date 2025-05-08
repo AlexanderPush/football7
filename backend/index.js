@@ -5,36 +5,37 @@ const path = require('path');
 const app = express();
 const port = 10000;
 
-const API_KEY = '4a0bce32b9584e8992e7a5c82548389d'; // Замените на ваш ключ API
+// Здесь используется API ключ от sstats.net, если он необходим
+const API_KEY = 'elumrolgdt9hfc3b';  // Замените на ваш ключ API
 
 app.use(express.static(path.join(__dirname, '../frontend')));  // Убедитесь, что путь правильный
 
-// Endpoint для получения матчей по лигам
+// Endpoint для получения матчей по лигам с sstats.net
 app.get('/api/matches', async (req, res) => {
   try {
-    const response = await axios.get('https://api.football-data.org/v4/matches?status=SCHEDULED', {
+    const response = await axios.get('https://sstats.net/api/matches', {
       headers: {
-        'X-Auth-Token': API_KEY
+        'Authorization': `Bearer ${API_KEY}`  // Пример для авторизации, если требуется
       }
     });
 
     // Группируем данные по лигам
     const groupedMatches = {};
     response.data.matches.forEach(match => {
-      const competition = match.competition.name;
+      const competition = match.competition;
       if (!groupedMatches[competition]) {
         groupedMatches[competition] = [];
       }
       groupedMatches[competition].push({
         homeTeam: {
-          name: match.homeTeam.name,
-          crest: match.homeTeam.crest
+          name: match.home_team,
+          crest: match.home_team_crest
         },
         awayTeam: {
-          name: match.awayTeam.name,
-          crest: match.awayTeam.crest
+          name: match.away_team,
+          crest: match.away_team_crest
         },
-        utcDate: match.utcDate,
+        utcDate: match.utc_date,
       });
     });
 
