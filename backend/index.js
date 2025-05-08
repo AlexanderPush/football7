@@ -1,10 +1,13 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 10000;
 
-// Для обработки статических файлов
-app.use(express.static(path.join(__dirname, 'frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));  // Убедись, что путь правильный
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));  // Путь до index.html
+});
 
 // Простой API для получения матчей
 app.get('/api/matches', (req, res) => {
