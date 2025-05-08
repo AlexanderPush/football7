@@ -117,6 +117,77 @@
       margin-bottom: 20px;
     }
 
+    /* Медиазапросы для адаптивности */
+
+    /* Для экранов шириной до 768px (мобильные устройства и планшеты) */
+    @media (max-width: 768px) {
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      #searchBar {
+        width: 90%;
+        font-size: 0.9rem;
+      }
+
+      .match {
+        padding: 12px;
+      }
+
+      .match-header {
+        font-size: 1rem;
+      }
+
+      .match-time {
+        font-size: 0.8rem;
+      }
+
+      .teams {
+        font-size: 1.3rem;
+      }
+
+      .odds {
+        font-size: 1rem;
+      }
+
+      .match-link {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+    }
+
+    /* Для экранов шириной до 480px (мобильные устройства) */
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      #searchBar {
+        width: 95%;
+        font-size: 0.8rem;
+      }
+
+      .match-header {
+        font-size: 0.9rem;
+      }
+
+      .match-time {
+        font-size: 0.7rem;
+      }
+
+      .teams {
+        font-size: 1.1rem;
+      }
+
+      .odds {
+        font-size: 0.9rem;
+      }
+
+      .match-link {
+        font-size: 0.8rem;
+        padding: 7px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -124,10 +195,10 @@
 
   <!-- Поиск матчей -->
   <div class="search-container">
-    <input type="text" id="searchBar" placeholder="Искать матчи..." oninput="filterMatches()">
+    <input type="text" id="searchBar" placeholder="Поиск матчей..." oninput="filterMatches()">
   </div>
 
-  <div id="matches">Загружаются матчи...</div>
+  <div id="matches">Загрузка...</div>
 
   <script>
     const apiUrl = 'https://api.football-data.org/v4/matches'; // Используем реальный API для получения матчей
@@ -163,8 +234,8 @@
             <span class="odds">${match.odds ? match.odds : 'Коэффициенты не доступны'}</span>
           </div>
           <a href="${match.matchUrl}" class="match-link" target="_blank">Посмотреть матч</a>
-          <p><strong>Лига:</strong> ${match.competition.name}</p>
-          <p><strong>Стадион:</strong> ${match.venue}</p>
+          <p><strong>Соревнование:</strong> ${match.competition.name}</p>
+          <p><strong>Место проведения:</strong> ${match.venue}</p>
         `;
 
         matchesContainer.appendChild(matchElement);
@@ -207,10 +278,6 @@
             competition: match.competition,
             venue: match.venue
           }));
-          
-          // Фильтруем только те матчи, которые не принадлежат бразильской лиге
-          matches = matches.filter(match => match.competition.name !== 'Brazilian Serie A');
-
           renderMatches(matches);
         }
       } catch (error) {
