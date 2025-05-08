@@ -4,28 +4,130 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football Matches</title>
-  <script>
-    async function loadMatches() {
-      const response = await fetch('/api/matches');
-      const matches = await response.json();
-      const matchesList = document.getElementById('matches-list');
-      
-      matches.forEach(match => {
-        const matchItem = document.createElement('div');
-        matchItem.innerHTML = `
-          <p><strong>${match.time}</strong>: ${match.teams}</p>
-          <p>Odds: ${match.odds}</p>
-          <a href="${match.link}" target="_blank">Watch Match</a>
-        `;
-        matchesList.appendChild(matchItem);
-      });
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script defer src="script.js"></script>
+  <style>
+    /* Общие стили для страницы */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
     }
-    
-    window.onload = loadMatches;
-  </script>
+
+    h2 {
+      color: #333;
+      font-size: 2rem;
+      margin: 20px;
+    }
+
+    /* Стили для контейнера с матчами */
+    #matches {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Стиль для каждой карточки матча */
+    .match {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .match:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .match-time {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .teams {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .odds {
+      color: #ff6347;
+      font-weight: bold;
+    }
+
+    .match-link {
+      display: block;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .match-link:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-  <h1>Football Matches</h1>
-  <div id="matches-list"></div>
+  <h2>⚽ Football Matches</h2>
+  <div id="matches">Loading...</div>
+
+  <script>
+    // Пример данных матчей
+    const matches = [
+      { time: '20:00', teams: 'Real Madrid vs Barcelona', link: 'https://stream1.com', odds: '1.9 - 3.2 - 4.1' },
+      { time: '22:00', teams: 'Manchester City vs PSG', link: 'https://stream2.com', odds: '2.1 - 3.0 - 3.5' }
+    ];
+
+    // Функция для отображения матчей
+    const renderMatches = (matches) => {
+      const matchesContainer = document.getElementById('matches');
+      matchesContainer.innerHTML = ''; // Очищаем содержимое контейнера
+
+      matches.forEach(match => {
+        const matchElement = document.createElement('div');
+        matchElement.classList.add('match');
+        
+        matchElement.innerHTML = `
+          <div class="match-header">
+            <span class="match-time">${match.time}</span>
+            <span class="odds">${match.odds}</span>
+          </div>
+          <div class="teams">${match.teams}</div>
+          <a href="${match.link}" class="match-link" target="_blank">Watch Match</a>
+        `;
+
+        matchesContainer.appendChild(matchElement);
+      });
+    };
+
+    // Загружаем и отображаем матчи
+    renderMatches(matches);
+  </script>
 </body>
 </html>
