@@ -10,7 +10,7 @@ bot.onText(/\/start/, (msg) => {
     reply_markup: {
       keyboard: [[{
         text: 'Открыть матчи',
-        web_app: { url: 'https://football7.onrender.com' } // твой URL Render
+        web_app: { url: 'https://football7.onrender.com' } // Замени на твой актуальный URL на Render
       }]],
       resize_keyboard: true,
       one_time_keyboard: true
