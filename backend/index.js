@@ -17,7 +17,8 @@ app.get('/api/matches', async (req, res) => {
   try {
     const response = await axios.get('https://api.football-data.org/v4/matches', {
       headers: {
-        'X-Auth-Token': '4a0bce32b9584e8992e7a5c82548389d'  // Ваш ключ API
+        'X-Auth-Token': '4a0bce32b9584e8992e7a5c82548389d', // Ваш ключ API
+        'Accept-Language': 'ru'  // Указываем, что хотим получать данные на русском
       }
     });
     
