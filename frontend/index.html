@@ -131,7 +131,7 @@
 
   <script>
     const apiUrl = 'https://api.football-data.org/v4/matches'; // Используем реальный API для получения матчей
-    const apiKey = '4a0bce32b9584e8992e7a5c82548389d'; // Замените на ваш ключ API
+    const apiKey = '4a0bce32b9584e8992e7a5c82548389d'; // Ваш API ключ
 
     // Массив матчей для примера
     let matches = [];
@@ -163,6 +163,8 @@
             <span class="odds">${match.odds ? match.odds : 'Odds not available'}</span>
           </div>
           <a href="${match.matchUrl}" class="match-link" target="_blank">Watch Match</a>
+          <p><strong>Competition:</strong> ${match.competition.name}</p>
+          <p><strong>Venue:</strong> ${match.venue}</p>
         `;
 
         matchesContainer.appendChild(matchElement);
@@ -201,7 +203,9 @@
               crest: match.awayTeam.crest
             },
             matchUrl: match.matchUrl,
-            odds: 'N/A' // Замените на реальную информацию о коэффициентах, если API предоставляет
+            odds: match.odds ? match.odds : 'N/A',
+            competition: match.competition,
+            venue: match.venue
           }));
           renderMatches(matches);
         }
