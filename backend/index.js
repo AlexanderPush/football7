@@ -7,20 +7,32 @@ const PORT = 10000;
 // Использование статики для фронтенда
 app.use(express.static(path.join(__dirname, '../frontend')));  // Убедитесь, что путь правильный
 
+// Обработчик главной страницы
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));  // Путь до index.html
+});
+
+// Простой API для получения матчей с реального API
 app.get('/api/matches', async (req, res) => {
   try {
     const response = await axios.get('https://api.football-data.org/v4/matches', {
       headers: {
-        'X-Auth-Token': process.env.FOOTBALL_API_KEY
+        'X-Auth-Token': '4a0bce32b9584e8992e7a5c82548389d'  // Ваш ключ API
       }
     });
     
     // Обработка полученных данных
     const matches = response.data.matches.map(match => ({
-      time: match.utcDate, // Преобразуем время, если нужно
-      teams: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
-      link: 'https://example.com', // Ссылка на трансляцию, если есть
-      odds: '1.9 - 3.2 - 4.1' // Здесь можно интегрировать коэффициенты, если они доступны
+      utcDate: match.utcDate,
+      homeTeam: {
+        name: match.homeTeam.name,
+        crest: match.homeTeam.crest || ''
+      },
+      awayTeam: {
+        name: match.awayTeam.name,
+        crest: match.awayTeam.crest || ''
+      },
+      competition: match.competition.name
     }));
 
     res.json(matches);
