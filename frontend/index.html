@@ -130,33 +130,20 @@
   <div id="matches">Loading...</div>
 
   <script>
-    const apiUrl = 'https://api.football-data.org/v4/matches'; // Пример API для получения данных
-    const apiKey = 'YOUR_API_KEY'; // Здесь нужно вставить ваш API ключ
+    const apiUrl = 'https://api.football-data.org/v4/matches'; // Используем реальный API для получения матчей
+    const apiKey = '4a0bce32b9584e8992e7a5c82548389d'; // Замените на ваш ключ API
 
     // Массив матчей для примера
-    let matches = [
-      {
-        time: '20:00',
-        teams: 'Real Madrid vs Barcelona',
-        team1Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Real_Madrid_CF_logo.svg/800px-Real_Madrid_CF_logo.svg.png',
-        team2Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/FC_Barcelona_logo_2021.svg/800px-FC_Barcelona_logo_2021.svg.png',
-        link: 'https://stream1.com',
-        odds: '1.9 - 3.2 - 4.1'
-      },
-      {
-        time: '22:00',
-        teams: 'Manchester City vs PSG',
-        team1Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Manchester_City_FC_badge.svg/800px-Manchester_City_FC_badge.svg.png',
-        team2Logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Paris_Saint-Germain_FC_2013_logo.svg/800px-Paris_Saint-Germain_FC_2013_logo.svg.png',
-        link: 'https://stream2.com',
-        odds: '2.1 - 3.0 - 3.5'
-      }
-    ];
+    let matches = [];
 
     // Функция для отображения матчей
     const renderMatches = (matches) => {
       const matchesContainer = document.getElementById('matches');
       matchesContainer.innerHTML = ''; // Очищаем содержимое контейнера
+
+      if (matches.length === 0) {
+        matchesContainer.innerHTML = 'No matches found!';
+      }
 
       matches.forEach(match => {
         const matchElement = document.createElement('div');
@@ -165,17 +152,17 @@
         matchElement.innerHTML = `
           <div class="match-header">
             <div class="team">
-              <img class="team-logo" src="${match.team1Logo}" alt="Team 1">
-              <span>${match.teams.split(' vs ')[0]}</span>
+              <img class="team-logo" src="${match.homeTeam.crest}" alt="Team 1">
+              <span>${match.homeTeam.name}</span>
             </div>
-            <span class="match-time">${match.time}</span>
+            <span class="match-time">${new Date(match.utcDate).toLocaleTimeString()}</span>
             <div class="team">
-              <img class="team-logo" src="${match.team2Logo}" alt="Team 2">
-              <span>${match.teams.split(' vs ')[1]}</span>
+              <img class="team-logo" src="${match.awayTeam.crest}" alt="Team 2">
+              <span>${match.awayTeam.name}</span>
             </div>
-            <span class="odds">${match.odds}</span>
+            <span class="odds">${match.odds ? match.odds : 'Odds not available'}</span>
           </div>
-          <a href="${match.link}" class="match-link" target="_blank">Watch Match</a>
+          <a href="${match.matchUrl}" class="match-link" target="_blank">Watch Match</a>
         `;
 
         matchesContainer.appendChild(matchElement);
@@ -186,15 +173,13 @@
     const filterMatches = () => {
       const query = document.getElementById('searchBar').value.toLowerCase();
       const filteredMatches = matches.filter(match => 
-        match.teams.toLowerCase().includes(query)
+        match.homeTeam.name.toLowerCase().includes(query) || 
+        match.awayTeam.name.toLowerCase().includes(query)
       );
       renderMatches(filteredMatches);
     };
 
     // Загружаем и отображаем матчи
-    renderMatches(matches);
-
-    // Для получения данных с API
     const fetchMatches = async () => {
       try {
         const response = await fetch(apiUrl, {
@@ -203,15 +188,23 @@
           }
         });
         const data = await response.json();
-        matches = data.matches.map(match => ({
-          time: match.utcDate,
-          teams: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
-          team1Logo: match.homeTeam.crest,
-          team2Logo: match.awayTeam.crest,
-          link: match.matchUrl,
-          odds: 'N/A' // Замените на реальную информацию о коэффициентах, если API предоставляет
-        }));
-        renderMatches(matches);
+
+        if (data.matches) {
+          matches = data.matches.map(match => ({
+            time: match.utcDate,
+            homeTeam: {
+              name: match.homeTeam.name,
+              crest: match.homeTeam.crest
+            },
+            awayTeam: {
+              name: match.awayTeam.name,
+              crest: match.awayTeam.crest
+            },
+            matchUrl: match.matchUrl,
+            odds: 'N/A' // Замените на реальную информацию о коэффициентах, если API предоставляет
+          }));
+          renderMatches(matches);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
