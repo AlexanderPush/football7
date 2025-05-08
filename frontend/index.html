@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Football Matches</title>
+  <title>Футбольные Матчи</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script defer src="script.js"></script>
   <style>
@@ -120,14 +120,14 @@
   </style>
 </head>
 <body>
-  <h2>⚽ Football Matches</h2>
+  <h2>⚽ Футбольные Матчи</h2>
 
   <!-- Поиск матчей -->
   <div class="search-container">
-    <input type="text" id="searchBar" placeholder="Search matches..." oninput="filterMatches()">
+    <input type="text" id="searchBar" placeholder="Искать матчи..." oninput="filterMatches()">
   </div>
 
-  <div id="matches">Loading...</div>
+  <div id="matches">Загружаются матчи...</div>
 
   <script>
     const apiUrl = 'https://api.football-data.org/v4/matches'; // Используем реальный API для получения матчей
@@ -142,7 +142,7 @@
       matchesContainer.innerHTML = ''; // Очищаем содержимое контейнера
 
       if (matches.length === 0) {
-        matchesContainer.innerHTML = 'No matches found!';
+        matchesContainer.innerHTML = 'Матчи не найдены!';
       }
 
       matches.forEach(match => {
@@ -152,19 +152,19 @@
         matchElement.innerHTML = `
           <div class="match-header">
             <div class="team">
-              <img class="team-logo" src="${match.homeTeam.crest}" alt="Team 1">
+              <img class="team-logo" src="${match.homeTeam.crest}" alt="Команда 1">
               <span>${match.homeTeam.name}</span>
             </div>
             <span class="match-time">${new Date(match.utcDate).toLocaleTimeString()}</span>
             <div class="team">
-              <img class="team-logo" src="${match.awayTeam.crest}" alt="Team 2">
+              <img class="team-logo" src="${match.awayTeam.crest}" alt="Команда 2">
               <span>${match.awayTeam.name}</span>
             </div>
-            <span class="odds">${match.odds ? match.odds : 'Odds not available'}</span>
+            <span class="odds">${match.odds ? match.odds : 'Коэффициенты не доступны'}</span>
           </div>
-          <a href="${match.matchUrl}" class="match-link" target="_blank">Watch Match</a>
-          <p><strong>Competition:</strong> ${match.competition.name}</p>
-          <p><strong>Venue:</strong> ${match.venue}</p>
+          <a href="${match.matchUrl}" class="match-link" target="_blank">Посмотреть матч</a>
+          <p><strong>Лига:</strong> ${match.competition.name}</p>
+          <p><strong>Стадион:</strong> ${match.venue}</p>
         `;
 
         matchesContainer.appendChild(matchElement);
@@ -207,10 +207,14 @@
             competition: match.competition,
             venue: match.venue
           }));
+          
+          // Фильтруем только те матчи, которые не принадлежат бразильской лиге
+          matches = matches.filter(match => match.competition.name !== 'Brazilian Serie A');
+
           renderMatches(matches);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Ошибка при загрузке данных:', error);
       }
     };
 
