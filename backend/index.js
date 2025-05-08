@@ -5,48 +5,41 @@ const path = require('path');
 const app = express();
 const port = 10000;
 
-// Укажите свой API-ключ, если он нужен (или уберите, если не требуется)
+// Замените на ваш API-ключ от SStats.net
 const API_KEY = 'elumrolgdt9hfc3b';
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Получение матчей
+// Endpoint для получения матчей
 app.get('/api/matches', async (req, res) => {
   try {
-    const response = await axios.get('https://sstats.net/api/matches', {
+    const response = await axios.get('https://api.sstats.net/games/list', {
       headers: {
-        // Уберите Authorization, если не нужен
-        'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json'
+        'apikey': API_KEY
       }
     });
 
-    console.log('Ответ от API:', response.data); // Посмотрите структуру данных
+    const matches = response.data;
 
-    const matches = response.data.matches || response.data.data || response.data;
-
-    if (!Array.isArray(matches)) {
-      return res.status(500).send('Структура данных не соответствует ожиданиям');
-    }
-
+    // Группируем матчи по лигам
     const groupedMatches = {};
-    matches.forEach(match => {
-      const league = match.league || match.competition || 'Неизвестная лига';
 
+    matches.forEach(match => {
+      const league = match.league.name;
       if (!groupedMatches[league]) {
         groupedMatches[league] = [];
       }
-
       groupedMatches[league].push({
         homeTeam: {
-          name: match.home_team || match.homeTeam?.name || 'N/A',
-          crest: match.home_team_crest || match.homeTeam?.crest || ''
+          name: match.home_team.name,
+          logo: match.home_team.logo
         },
         awayTeam: {
-          name: match.away_team || match.awayTeam?.name || 'N/A',
-          crest: match.away_team_crest || match.awayTeam?.crest || ''
+          name: match.away_team.name,
+          logo: match.away_team.logo
         },
-        utcDate: match.utc_date || match.date || match.utcDate || 'N/A',
+        date: match.date,
+        time: match.time
       });
     });
 
@@ -57,7 +50,7 @@ app.get('/api/matches', async (req, res) => {
   }
 });
 
-// Главная страница
+// Обработчик главной страницы
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
